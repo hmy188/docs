@@ -64,3 +64,47 @@
 > ```
 >
 > 现在，您的Prometheus服务已经重新加载了新的告警规则，并可以根据这些规则发出告警通知。
+
+# 来个示例，不需要生成规则，只需要confd把规则传送到Prometheus
+
+好的，以下是一个示例，演示如何使用 ConfD 从 Consul 中获取告警规则，并将其传递给 Prometheus。
+
+假设您已经有一个告警规则文件，例如 `alerts.yml`，并将其存储在 Consul 的路径 `config/alerts.yml` 中。
+
+1. 配置 Consul 服务发现的相关参数
+
+在 Prometheus 的配置文件中，添加以下配置，以启用 Consul 服务发现：
+
+```
+# Prometheus 配置文件
+scrape_configs:
+  - job_name: 'example'
+    consul_sd_configs:
+      - server: 'localhost:8500'
+        query: 'config/alerts.yml'
+```
+
+上述配置中，`server` 参数指定 Consul 服务的地址和端口，`query` 参数指定要查询的告警规则的路径。在这个示例中，我们要查询 `config/alerts.yml` 这个路径下的告警规则。
+
+2. 添加告警规则的配置项
+
+在 Prometheus 的配置文件中，添加以下配置，以指定告警规则的存储位置和查询语句：
+
+```
+# Prometheus 配置文件
+rule_files:
+  - 'config/alerts.yml'
+```
+
+上述配置中，`rule_files` 参数指定告警规则文件的路径。在这个示例中，我们要加载 `config/alerts.yml` 这个路径下的告警规则。
+
+3. 启动 Prometheus 和 ConfD
+
+启动 Prometheus 和 ConfD，它们将自动从 Consul 中获取告警规则，并将其放入 Prometheus 的配置文件中。如果您使用 systemd 等系统服务管理工具，可以通过以下命令来启动 Prometheus 和 ConfD：
+
+```
+systemctl start prometheus
+systemctl start confd
+```
+
+以上就是一个简单的示例，演示了如何使用 ConfD 从 Consul 中获取告警规则，并将其传递给 Prometheus。如果您有其他问题或需要进一步的帮助，请随时告诉我。
